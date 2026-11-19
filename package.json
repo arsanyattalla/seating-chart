@@ -1,18 +1,18 @@
 {
   "name": "wedding-seating",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
-  "description": "Elegant wedding seating dashboard and guest lookup",
+  "type": "module",
+  "description": "Static wedding seating website hosted on Netlify",
   "scripts": {
-    "build": "echo 'Build complete'",
-    "start": "node server.js",
-    "dev": "node --watch server.js"
-
+    "build": "echo 'Static site ready for Netlify'",
+    "dev": "netlify dev"
   },
   "dependencies": {
-    "csv-parse": "^5.6.0",
-    "express": "^4.21.2",
-    "express-session": "^1.18.1",
-    "multer": "^1.4.5-lts.1"
+    "@netlify/blobs": "^8.1.0",
+    "csv-parse": "^5.6.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^23.0.0"
   }
 }

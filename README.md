@@ -1,35 +1,63 @@
-# Wedding Seating
+# Wedding Seating — Netlify edition
 
-A responsive wedding seating website with:
-- Private admin dashboard at `/`
-- Public guest lookup and seating chart at `/seating`
-- Live name suggestions as guests type
-- CSV template download, CSV import, and CSV export
-- Add, edit, remove, and assign guests individually
-- Table names and table-by-table seating overview
-- Persistent guest data stored in `data/data.json`
+A static wedding seating website with a Netlify Function API and Netlify Blobs persistence.
 
-## Run locally
+## What's changed
 
-1. Install Node.js 18 or newer.
-2. In this folder, install dependencies:
-   ```bash
-   npm install
-   ```
-3. Copy `.env.example` to `.env`.
-4. Change `ADMIN_PASSWORD` and `SESSION_SECRET` in `.env`.
-5. Start the site:
-   ```bash
-   npm start
-   ```
-6. Open `http://localhost:3000` for the admin dashboard.
-7. Open `http://localhost:3000/seating` for the guest-facing page.
+- The frontend in `public/` is served as a static site through Netlify's CDN.
+- The `/api/*` routes are handled by `netlify/functions/api.mjs`.
+- Guest and table data is stored in **Netlify Blobs**, not in the deployed filesystem.
+- Admin authentication uses a signed, HTTP-only, secure cookie.
+- Existing dashboard, guest lookup, seating chart, CSV import, and CSV export UI are retained.
 
-If you do not create a `.env` file, the local fallback password is `wedding123`. Change it before putting the site online.
+## Deploy to Netlify
+
+1. Push this folder to a GitHub repository.
+2. In Netlify, choose **Add new project → Import an existing project** and select that repository.
+3. Netlify should read `netlify.toml` automatically (publish directory: `public`; functions directory: `netlify/functions`).
+4. In **Site configuration → Environment variables**, add:
+   - `ADMIN_PASSWORD`: a strong, unique dashboard password.
+   - `SESSION_SECRET`: a long random secret (at least 32 random characters).
+5. Trigger a deploy.
+6. Visit `/` to sign in and `/seating` for the public guest page.
+
+Generate a secret locally with:
+
+```bash
+openssl rand -hex 32
+```
+
+Do not commit real passwords or secrets to GitHub.
+
+## Local development
+
+Requires Node.js 20 or newer.
+
+```bash
+npm install
+cp .env.example .env
+# Edit .env and set both values
+npm run dev
+```
+
+Netlify CLI loads `.env` for local development. Netlify Blobs uses its local development store when running through `netlify dev`.
+
+## Data migration — important
+
+On its first call, the function initializes an empty Blobs store from the `SEED` object in `netlify/functions/api.mjs`. **Before deploying with your real guest list, replace that object with the contents of your current `data/data.json`.** The uploaded source archive contains four sample guests; it does not contain a separate production guest export.
+
+After first initialization, Netlify Blobs is the source of truth. Updating `SEED` later will not overwrite existing stored data. Export a CSV from the dashboard periodically as a backup.
+
+## Security and privacy
+
+- Set both environment variables before deployment. Login will not work without them.
+- The admin cookie is `HttpOnly`, `Secure`, and `SameSite=Strict`, and expires after 8 hours.
+- Public endpoints expose guest names and table assignments, matching the original public seating-chart behavior. Only publish information intended for wedding guests.
+- Netlify Blobs persists data across deployments; the old JSON file is no longer used at runtime.
 
 ## CSV format
 
-Download `guests-template.csv` from the dashboard or use the included file. The header row must contain:
+The CSV header must contain `name`; `table` and `notes` are optional.
 
 ```csv
 name,table,notes
@@ -38,14 +66,4 @@ Taylor Morgan,1,Vegetarian
 Jordan Lee,2,
 ```
 
-- `name` is required.
-- `table` is the table number.
-- `notes` is optional and only visible in the admin dashboard.
-- Importing a guest with a name that already exists updates that guest's table and notes. New names are added.
-- Export downloads the current guest list.
-
-## Before sharing with wedding guests
-
-This project is ready to run locally. To let guests use `/seating` on their own phones, deploy the app to a Node.js host and use persistent storage for `data/data.json` (or replace the JSON store with a hosted database). Use HTTPS, set a strong `ADMIN_PASSWORD` and `SESSION_SECRET`, and back up your guest data. The included JSON file is suitable for a small event on a single persistent server; ephemeral hosting may erase it on redeploy.
-
-The public page intentionally reveals guest names and table assignments in its seating chart. If you would rather keep the full chart private and only show each guest their own assignment, remove or disable the table directory section in `public/app.js`.
+Existing guest names are updated during import; new names are added.
