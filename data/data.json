@@ -1,0 +1,12 @@
+{
+  "guests": [
+    { "id": "sample-1", "name": "Olivia Bennett", "table": "1", "notes": "" },
+    { "id": "sample-2", "name": "James Bennett", "table": "1", "notes": "" },
+    { "id": "sample-3", "name": "Sophia Carter", "table": "2", "notes": "" },
+    { "id": "sample-4", "name": "Daniel Carter", "table": "2", "notes": "" }
+  ],
+  "tables": [
+    { "number": "1", "name": "The Garden Table" },
+    { "number": "2", "name": "The Champagne Table" }
+  ]
+}
