@@ -84,7 +84,7 @@ async function renderGuestPage(){
        <img class="floral-art" src="/floral-header.jpg" alt="">
        <div class="couple-title">Arsany <span>&amp;</span> Mariz</div>
        <div class="title-ornament"><i></i><span>◇</span><i></i></div>
-       <p class="invitation-tagline">Find your seat &amp; share your memories</p>
+       <p class="invitation-tagline">Find your seat </p>
      </header>
      <nav class="invitation-tabs" aria-label="Seating navigation">
        <button class="invitation-tab active" id="findTab">Find my seat</button>
